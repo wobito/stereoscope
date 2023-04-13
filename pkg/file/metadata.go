@@ -3,6 +3,7 @@ package file
 import (
 	"archive/tar"
 	"io"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -30,6 +31,7 @@ type Metadata struct {
 	ModTime    time.Time
 	AccessTime time.Time
 	ChangeTime time.Time
+	FileInfo   fs.FileInfo
 }
 
 func NewMetadata(header tar.Header, content io.Reader) Metadata {
@@ -46,6 +48,7 @@ func NewMetadata(header tar.Header, content io.Reader) Metadata {
 		AccessTime:      header.AccessTime.UTC(),
 		ChangeTime:      header.ChangeTime.UTC(),
 		MIMEType:        MIMEType(content),
+		FileInfo:        header.FileInfo(),
 	}
 }
 
@@ -130,5 +133,6 @@ func NewMetadataFromPath(path string, info os.FileInfo) Metadata {
 		MIMEType: mimeType,
 		IsDir:    info.IsDir(),
 		ModTime:  info.ModTime().UTC(),
+		FileInfo: info,
 	}
 }
